@@ -57,15 +57,6 @@ app.get('/login', function(req, res) {
     }));
 });
 
-app.get('/', function(req, res){
-  res.redirect('/callback');
-});
-
-app.get('/favicon.ico', function(req, res){
-  res.redirect('/callback');
-});
-
-
 app.get('/callback', function(req, res) {
 
   // your application requests refresh and access tokens
@@ -126,6 +117,14 @@ app.get('/callback', function(req, res) {
       }
     });
   }
+});
+
+app.get('/', function(req, res){
+  res.redirect('/callback');
+});
+
+app.get('/favicon.ico', function(req, res){
+  res.redirect('/callback');
 });
 
 console.log('Listening on 8888');
