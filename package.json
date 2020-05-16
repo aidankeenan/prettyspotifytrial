@@ -25,7 +25,7 @@
     "request": "*",
     "cors": "*",
     "querystring": "*",
-    "cookieParser": "*"
+    "cookieparser": "*"
   }
 }
 
