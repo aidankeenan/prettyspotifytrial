@@ -57,7 +57,9 @@ app.get('/login', function(req, res) {
     }));
 });
 
-
+app.get('/', function(req, res){
+  res.redirect('/callback');
+});
 
 app.get('/callback', function(req, res) {
 
