@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Pretty Top Songs</title>
+    <link href="/public/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    
+    <style type="text/css">
+      #login, #loggedin {
+        display: none;
+      }
+      .text-overflow {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 500px;
+      }
+      
+      .btn-primary
+      {
+        margin: auto;
+        color: #e3ded9;
+      }
+      body 
+      {
+          background: linear-gradient(-45deg, #f8b195, #f67280, #c06c84, #675b7b, #355c7d );
+          background-size: 400% 400%;
+          animation: gradient 25s ease infinite;
+          color: #e3ded9;
+          margin: auto;
+          font-family: Bangers;
+          align-content: center;
+      }
+
+      @keyframes gradient 
+      {
+          0% {
+              background-position: 0% 50%;
+          }
+          50% {
+              background-position: 100% 50%;
+          }
+          100% {
+              background-position: 0% 50%;
+          }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div id="login">
+        <a href="/login" class="btn btn-primary">Log in with Spotify</a>
+      </div>
+      <div id="loggedin">
+        <div id="tops"></div>
+      </div>
+    </div>
+
+    <script id="tops-template" type="text/x-handlebars-template">
+      <h1>your top songs</h1>
+      <div class="media-body">
+        <dl class="dl-horizontal">
+          <dt>1</dt><dd>{{track0}}</dd>
+          <dt>2</dt><dd>{{track1}}</dd>
+          <dt>3</dt><dd>{{track2}}</dd>
+          <dt>4</dt><dd>{{track3}}</dd>
+          <dt>5</dt><dd>{{track4}}</dd>
+          <dt>6</dt><dd>{{track5}}</dd>
+          <dt>7</dt><dd>{{track6}}</dd>
+          <dt>8</dt><dd>{{track7}}</dd>
+          <dt>9</dt><dd>{{track8}}</dd>
+          <dt>10</dt><dd>{{track9}}</dd>
+          <dt>11</dt><dd>{{track10}}</dd>
+          <dt>12</dt><dd>{{track11}}</dd>
+          <dt>13</dt><dd>{{track12}}</dd>
+          <dt>14</dt><dd>{{track13}}</dd>
+          <dt>15</dt><dd>{{track14}}</dd>
+          <dt>16</dt><dd>{{track15}}</dd>
+          <dt>17</dt><dd>{{track16}}</dd>
+          <dt>18</dt><dd>{{track17}}</dd>
+          <dt>19</dt><dd>{{track18}}</dd>
+          <dt>20</dt><dd>{{track19}}</dd>
+        </dl>
+      </div>
+    </script>
+
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script>
+      (function() {
+
+        /**
+         * Obtains parameters from the hash of the URL
+         * @return Object
+         */
+        function getHashParams() {
+          var hashParams = {};
+          var e, r = /([^&;=]+)=?([^&;]*)/g,
+              q = window.location.hash.substring(1);
+          while ( e = r.exec(q)) {
+             hashParams[e[1]] = decodeURIComponent(e[2]);
+          }
+          return hashParams;
+        }
+
+        var topsSource = document.getElementById('tops-template').innerHTML,
+            topsTemplate = Handlebars.compile(topsSource),
+            topsPlaceholder = document.getElementById('tops');
+
+        var params = getHashParams();
+
+        var access_token = params.access_token,
+            refresh_token = params.refresh_token,
+            error = params.error;
+
+        if (error) {
+          alert('There was an error during the authentication');
+        } else {
+          if (access_token) {
+            
+            $.ajax({
+              url: 'https://api.spotify.com/v1/me/top/tracks',
+              headers: {
+                'Authorization': 'Bearer ' + access_token
+              },
+              success: function(response) {
+                var track_array = response;
+                var items = track_array.items;
+                var tracklist = {}
+                for (i = 0; i < items.length; i++) {
+                  tracklist['track' + i] = items[i].name
+                };
+                topsPlaceholder.innerHTML = topsTemplate(tracklist);
+
+                $('#login').hide();
+                $('#loggedin').show();
+              }
+            });
+
+
+          } else {
+              // render initial screen
+              $('#login').show();
+              $('#loggedin').hide();
+          }
+        }
+      })();
+      
+    </script>
+   
+  </body>
+</html>
+
