@@ -1,0 +1,19 @@
+{
+  "name": "authorization_code",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aidankeenan/prettyspotifytrial.git"
+  },
+  "author": "aidan keenan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aidankeenan/prettyspotifytrial/issues"
+  },
+  "homepage": "https://github.com/aidankeenan/prettyspotifytrial#readme"
+}
