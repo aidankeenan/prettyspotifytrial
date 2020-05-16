@@ -21,7 +21,11 @@
   },
   "homepage": "https://github.com/aidankeenan/prettyspotifytrial#readme",
   "dependencies": {
-    "express":"*"
+    "express": "*",
+    "request": "*",
+    "cors": "*",
+    "querystring": "*",
+    "cookieParser": "*"
   }
 }
 
