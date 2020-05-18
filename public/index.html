@@ -1,90 +1,61 @@
 <!doctype html>
 <html>
   <head>
-    <title>Pretty Top Songs</title>
+    <title>Your Music: Colorized</title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    
-    <style type="text/css">
-      #login, #loggedin {
-        display: none;
-      }
-      .text-overflow {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        width: 500px;
-      }
-      
-      .btn-primary
-      {
-        margin: auto;
-        color: #e3ded9;
-      }
-      body 
-      {
-          background: linear-gradient(-45deg, #f8b195, #f67280, #c06c84, #675b7b, #355c7d );
-          background-size: 400% 400%;
-          animation: gradient 25s ease infinite;
-          color: #e3ded9;
-          margin: auto;
-          font-family: Bangers;
-          align-content: center;
-      }
-
-      @keyframes gradient 
-      {
-          0% {
-              background-position: 0% 50%;
-          }
-          50% {
-              background-position: 100% 50%;
-          }
-          100% {
-              background-position: 0% 50%;
-          }
-      }
-    </style>
+    <link rel="stylesheet" type="text/css" href="../styles/style.css">
+    <link id="look" rel="stylesheet" type="text/css" href="../styles/default.css">
+    <link id="speed" rel="stylesheet" type="text/css" href="../styles/speed0.css">
+    <script type="text/javascript">
+      function colorswitcher(sheet) {
+        document.getElementById('look').setAttribute('href', sheet);
+      };
+      function speedswitcher(sheet) {
+        document.getElementById('speed').setAttribute('href', sheet);
+      };
+    </script>
   </head>
 
-  <body>
+  <body id="bod">
     <div class="container">
       <div id="login">
         <a href="/login" class="btn btn-primary">Log in with Spotify</a>
       </div>
       <div id="loggedin">
-        <div id="tops"></div>
+        <div id="nowplaying"></div>
+        <div id="colors"></div>
+        <button onclick="openFullscreen();">Fullscreen</button>
       </div>
     </div>
 
-    <script id="tops-template" type="text/x-handlebars-template">
-      <h1>your top songs of all time</h1>
-      <div class="media-body">
-        <dl class="dl-horizontal">
-          <dt>1</dt><dd>{{track0}}</dd>
-          <dt>2</dt><dd>{{track1}}</dd>
-          <dt>3</dt><dd>{{track2}}</dd>
-          <dt>4</dt><dd>{{track3}}</dd>
-          <dt>5</dt><dd>{{track4}}</dd>
-          <dt>6</dt><dd>{{track5}}</dd>
-          <dt>7</dt><dd>{{track6}}</dd>
-          <dt>8</dt><dd>{{track7}}</dd>
-          <dt>9</dt><dd>{{track8}}</dd>
-          <dt>10</dt><dd>{{track9}}</dd>
-          <dt>11</dt><dd>{{track10}}</dd>
-          <dt>12</dt><dd>{{track11}}</dd>
-          <dt>13</dt><dd>{{track12}}</dd>
-          <dt>14</dt><dd>{{track13}}</dd>
-          <dt>15</dt><dd>{{track14}}</dd>
-          <dt>16</dt><dd>{{track15}}</dd>
-          <dt>17</dt><dd>{{track16}}</dd>
-          <dt>18</dt><dd>{{track17}}</dd>
-          <dt>19</dt><dd>{{track18}}</dd>
-          <dt>20</dt><dd>{{track19}}</dd>
-        </dl>
-      </div>
+    <script>
+      var elem = document.documentElement;
+      function openFullscreen() {
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) { /* Firefox */
+          elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+          elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) { /* IE/Edge */
+          elem.msRequestFullscreen();
+        }
+      }
+      </script>
+
+
+    <script id="colors-template" type="text/x-handlebars-template">
+      <dl class="dl-horizontal">
+        <dt>milisecoonds: </dt><dd>{{dur}}</dd>
+        <dt>mode: </dt><dd>{{mode}}</dd>
+        <dt>danceability: </dt><dd>{{dance}}</dd>
+        <dt>energy: </dt><dd>{{energy}}</dd>
+        <dt>valence: </dt><dd>{{valence}}</dd>
+        <dt>tempo: </dt><dd>{{tempo}}</dd>
+      </dl>
     </script>
-
-
+    
+    
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
@@ -105,9 +76,9 @@
           return hashParams;
         }
 
-        var topsSource = document.getElementById('tops-template').innerHTML,
-            topsTemplate = Handlebars.compile(topsSource),
-            topsPlaceholder = document.getElementById('tops');
+        var colorsSource = document.getElementById('colors-template').innerHTML,
+            colorsTemplate = Handlebars.compile(colorsSource),
+            colorsPlaceholder = document.getElementById('colors');
 
         var params = getHashParams();
 
@@ -121,24 +92,94 @@
           if (access_token) {
             
             $.ajax({
-              url: 'https://api.spotify.com/v1/me/top/tracks?time_range=long_term',
+              url: 'https://api.spotify.com/v1/me/player/currently-playing',
               headers: {
                 'Authorization': 'Bearer ' + access_token
               },
               success: function(response) {
-                var track_array = response;
-                var items = track_array.items;
-                var tracklist = {}
-                for (i = 0; i < items.length; i++) {
-                  tracklist['track' + i] = items[i].name
-                };
-                topsPlaceholder.innerHTML = topsTemplate(tracklist);
-
+                var response = response;
+                var track = response.item;
+                var id = track.id;
+                var artists = track.artists
+                var primaryartist = artists[0].name;
+                document.getElementById("nowplaying").innerHTML = track.name + ' - ' + primaryartist;
+                $.ajax({
+                    url: 'https://api.spotify.com/v1/audio-features/' + id,
+                    headers: {
+                      'Authorization': 'Bearer ' + access_token
+                    },
+                    success: function(response) {
+                      var features = response;
+                      var dur = features.duration_ms;
+                      var mode = features.mode;
+                      var dance = features.danceability;
+                      var energy = features.energy;
+                      var valence = features.valence;
+                      var tempo = features.tempo;
+                      // color control
+                      if (valence < 0.1) {
+                          console.log('super duper sad');
+                          colorswitcher('../styles/0.css');
+                      } else if (valence < 0.2) {
+                          console.log('very sad');
+                          colorswitcher('../styles/1.css');
+                      } else if (valence < 0.3) {
+                          console.log('sad');
+                          colorswitcher('../styles/2.css');
+                      } else if (valence < 0.4) {
+                          console.log('kinda sad');
+                          colorswitcher('../styles/3.css');
+                      } else if (valence < 0.5) {
+                          console.log('low neutral');
+                          colorswitcher('../styles/4.css');
+                      } else if (valence < 0.6) {
+                          console.log('high neutral');
+                          colorswitcher('../styles/5.css');
+                      } else if (valence < 0.7) {
+                          console.log('kinda happy');
+                          colorswitcher('../styles/6.css');
+                      } else if (valence < 0.8) {
+                          console.log('happy');
+                          colorswitcher('../styles/7.css');
+                      } else if (valence < 0.9) {
+                          console.log('very happy');
+                          colorswitcher('../styles/8.css');
+                      } else if (valence <= 1.0) {
+                          console.log('super duper happy');
+                          colorswitcher('../styles/9.css');
+                      };
+                      // speed control
+                      if (energy < 0.166) {
+                        console.log('very low');
+                        speedswitcher('../styles/speed5.css');
+                      } else if (energy < 0.3333) {
+                          console.log('low');
+                          speedswitcher('../styles/speed4.css');
+                      } else if (energy < 0.5) {
+                          console.log('med');
+                          speedswitcher('../styles/speed3.css');
+                      } else if (energy < 0.6666) {
+                          console.log('med-high');
+                          speedswitcher('../styles/speed2.css');
+                      } else if (energy < 0.83) {
+                          console.log('high');
+                          speedswitcher('../styles/speed1.css');
+                      } else if (energy < 1.0) {
+                           console.log('very high');
+                          speedswitcher('../styles/speed0.css');
+                      };
+                      var info = {"dur": dur, "mode": mode, "dance": dance, "energy": energy, "valence": valence, "tempo": tempo};
+                      colorsPlaceholder.innerHTML = colorsTemplate(info);
+                  
+                      $('#login').hide();
+                      $('#loggedin').show();
+                    }
+                  });
+              
                 $('#login').hide();
                 $('#loggedin').show();
               }
             });
-
 
           } else {
               // render initial screen
@@ -152,4 +193,3 @@
    
   </body>
 </html>
-

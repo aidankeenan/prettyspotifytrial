@@ -13,9 +13,9 @@ var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 
-var client_id = 'f043a7fba90f4b00903bcffefb13e9ae'; // Your client id
-var client_secret = '19affea44ed64c35b0c4dd724fbc1fe6'; // Your secret
-var redirect_uri = 'https://whispering-reef-30772.herokuapp.com/callback'; // Your redirect uri
+var client_id = '4f67416c80c84a308eb0b09b6fadb1a0'; // Your client id
+var client_secret = 'ce837a8b92144535bce61383e336eed5'; // Your secret
+var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
 
 /**
  * Generates a random string containing numbers and letters
@@ -46,7 +46,7 @@ app.get('/login', function(req, res) {
   res.cookie(stateKey, state);
 
   // your application requests authorization
-  var scope = 'user-read-private user-read-email user-top-read user-read-recently-played';
+  var scope = 'user-read-currently-playing user-read-playback-state';
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
@@ -81,7 +81,7 @@ app.get('/callback', function(req, res) {
         grant_type: 'authorization_code'
       },
       headers: {
-        'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+        'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64'))
       },
       json: true
     };
@@ -91,17 +91,6 @@ app.get('/callback', function(req, res) {
 
         var access_token = body.access_token,
             refresh_token = body.refresh_token;
-
-        var tops = {
-          url: 'https://api.spotify.com/v1/me/top/tracks',
-          headers: { 'Authorization': 'Bearer ' + access_token },
-          json: true
-        };
-
-        // use the access token to access the Spotify Web API
-        request.get(tops, function(error, response, body) {
-          console.log(body);
-        });
 
         // we can also pass the token to the browser to make requests from there
         res.redirect('/#' +
