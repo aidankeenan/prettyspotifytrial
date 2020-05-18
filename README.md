@@ -1,3 +1,1 @@
 # prettyspotifytrial
-# prettycolors
-# prettycolors
